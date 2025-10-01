@@ -1,53 +1,90 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Http\Controllers\Controller;
 use App\Models\Book;
+use App\Models\User;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
 
 class BookController extends Controller
 {
-    public function index()
+    /**
+     * Tampilkan semua data buku
+     */
+    public function index(): JsonResponse
     {
         $books = Book::all();
-        return view('books.index', compact('books'));
+        return response()->json([
+            'success' => true,
+            'message' => 'Daftar semua buku',
+            'data' => $books
+        ], 200);
     }
 
-    public function create()
+    /**
+     * Simpan data buku baru
+     */
+    public function store(Request $request): JsonResponse
     {
-        return view('books.create');
-    }
-
-    public function store(Request $request)
-    {
-        $request->validate([
-            'title' => 'required',
-            'author' => 'required',
+        $validated = $request->validate([
+            'title'  => 'required|string|max:255',
+            'author' => 'required|string|max:255',
         ]);
 
-        Book::create($request->all());
-        return redirect()->route('books.index')->with('success', 'Buku berhasil ditambahkan.');
+        $book = Book::create($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Buku berhasil ditambahkan',
+            'data'    => $book
+        ], 201);
     }
 
-    public function edit(Book $book)
+    /**
+     * Tampilkan detail buku
+     */
+    public function show(Book $book): JsonResponse
     {
-        return view('books.edit', compact('book'));
+        return response()->json([
+            'success' => true,
+            'message' => 'Detail buku',
+            'data'    => $book
+        ], 200);
     }
 
-    public function update(Request $request, Book $book)
+    /**
+     * Update data buku
+     */
+    public function update(Request $request, Book $book): JsonResponse
     {
-        $request->validate([
-            'title' => 'required',
-            'author' => 'required',
+        $validated = $request->validate([
+            'title'  => 'required|string|max:255',
+            'author' => 'required|string|max:255',
         ]);
 
-        $book->update($request->all());
-        return redirect()->route('books.index')->with('success', 'Buku berhasil diperbarui.');
+        $book->update($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Buku berhasil diperbarui',
+            'data'    => $book
+        ], 200);
     }
 
-    public function destroy(Book $book)
+    /**
+     * Hapus buku
+     */
+    public function destroy(Book $book): JsonResponse
     {
         $book->delete();
-        return redirect()->route('books.index')->with('success', 'Buku berhasil dihapus.');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Buku berhasil dihapus'
+        ], 200);
     }
 }
