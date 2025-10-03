@@ -31,8 +31,10 @@ class BookController extends Controller
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'title'  => 'required|string|max:255',
-            'author' => 'required|string|max:255',
+            'title'       => 'required|string|max:255',
+            'author'      => 'required|string|max:255',
+            'year'        => 'nullable|digits:4|integer',
+            'description' => 'nullable|string',
         ]);
 
         $book = Book::create($validated);
@@ -62,8 +64,10 @@ class BookController extends Controller
     public function update(Request $request, Book $book): JsonResponse
     {
         $validated = $request->validate([
-            'title'  => 'required|string|max:255',
-            'author' => 'required|string|max:255',
+            'title'       => 'required|string|max:255',
+            'author'      => 'required|string|max:255',
+            'year'        => 'nullable|digits:4|integer',
+            'description' => 'nullable|string',
         ]);
 
         $book->update($validated);
